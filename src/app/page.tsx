@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import * as LS from "@/lib/lifeSafetyFormulas";
 import * as F from "@/lib/spreadsheetFormulas";
 
 type KpqMode = "k" | "q" | "p";
@@ -202,6 +203,44 @@ export default function Home() {
       side: F.squareSideLength(a),
     };
   }, [sprArea, sprCov]);
+
+  const [occSqFt, setOccSqFt] = useState("1000");
+  const [occTypeIdx, setOccTypeIdx] = useState(0);
+
+  const occ = useMemo(() => {
+    const sq = parseNum(occSqFt);
+    const row = LS.OCCUPANT_LOAD_FACTORS[occTypeIdx];
+    if (sq === null || !row) return null;
+    if (sq < 0) return null;
+    const load = LS.occupantLoadFromArea(sq, row.factor);
+    return { sq, row, load };
+  }, [occSqFt, occTypeIdx]);
+
+  const [diagFt, setDiagFt] = useState("100");
+
+  const exitSep = useMemo(() => {
+    const d = parseNum(diagFt);
+    if (d === null || d < 0) return null;
+    return {
+      withSprinklers: LS.exitSeparationSprinklered(d),
+      withoutSprinklers: LS.exitSeparationNonSprinklered(d),
+    };
+  }, [diagFt]);
+
+  const [exitOl, setExitOl] = useState("100");
+
+  const exitWidth = useMemo(() => {
+    const ol = parseNum(exitOl);
+    if (ol === null || ol < 0) return null;
+    const noVoiceIn = LS.exitWidthInches(ol, 0.2);
+    const voiceIn = LS.exitWidthInches(ol, 0.15);
+    return {
+      noVoiceIn,
+      noVoiceFt: LS.inchesToFeet(noVoiceIn),
+      voiceIn,
+      voiceFt: LS.inchesToFeet(voiceIn),
+    };
+  }, [exitOl]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-100 to-zinc-200 pb-16 pt-10 dark:from-zinc-950 dark:to-zinc-900">
@@ -408,10 +447,132 @@ export default function Home() {
             />
           </Section>
 
+          <Section
+            title="Occupant load"
+            subtitle="Based on CBC/CFC Table 1004.5 occupant load factors (square feet per person). Always confirm against your adopted code edition."
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field id="occSq" label="Square footage" value={occSqFt} onChange={setOccSqFt} unit="ft²" />
+              <div className="space-y-1.5">
+                <label htmlFor="occType" className="block text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                  Occupancy / use
+                </label>
+                <p className="text-xs text-zinc-500 dark:text-zinc-500">Load factor (sq ft / person)</p>
+                <select
+                  id="occType"
+                  value={occTypeIdx}
+                  onChange={(e) => setOccTypeIdx(Number(e.target.value))}
+                  className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none ring-emerald-500/30 focus:border-emerald-500 focus:ring-4 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                >
+                  {LS.OCCUPANT_LOAD_FACTORS.map((o, i) => (
+                    <option key={o.name} value={i}>
+                      {o.name} — {o.factor} ft²/person
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <ResultTable
+              rows={
+                occ
+                  ? [
+                      { label: "Square footage", value: fmt(occ.sq, 2), detail: "ft²" },
+                      { label: "Load factor", value: String(occ.row.factor), detail: "ft² per person" },
+                      {
+                        label: "Calculated occupant load",
+                        value: String(occ.load),
+                        detail: "persons (rounded up)",
+                      },
+                    ]
+                  : [
+                      {
+                        label: "Results",
+                        value: "—",
+                        detail: "Enter valid square footage.",
+                      },
+                    ]
+              }
+            />
+          </Section>
+
+          <Section
+            title="Minimum exit separation"
+            subtitle="From overall maximum diagonal dimension: one-third with sprinklers, one-half without (typical code-style check; verify locally)."
+          >
+            <Field
+              id="diag"
+              label="Maximum overall diagonal dimension"
+              hint="Longest straight-line distance across the floor plan (ft)"
+              value={diagFt}
+              onChange={setDiagFt}
+              unit="ft"
+            />
+            <ResultTable
+              rows={
+                exitSep
+                  ? [
+                      {
+                        label: "With sprinklers",
+                        value: fmt(exitSep.withSprinklers, 2),
+                        detail: "ft (diagonal ÷ 3)",
+                      },
+                      {
+                        label: "Without sprinklers",
+                        value: fmt(exitSep.withoutSprinklers, 2),
+                        detail: "ft (diagonal ÷ 2)",
+                      },
+                    ]
+                  : [
+                      {
+                        label: "Results",
+                        value: "—",
+                        detail: "Enter a non-negative diagonal length.",
+                      },
+                    ]
+              }
+            />
+          </Section>
+
+          <Section
+            title="Exit width (single story)"
+            subtitle="Minimum required exit width from occupant load: × 0.20 in/person (without voice evacuation) and × 0.15 in/person (with sprinklers and voice evacuation), matching the prior worksheet layout."
+          >
+            <Field
+              id="exitOl"
+              label="Occupant load"
+              value={exitOl}
+              onChange={setExitOl}
+              unit="persons"
+            />
+            <ResultTable
+              rows={
+                exitWidth
+                  ? [
+                      {
+                        label: "Without voice evacuation",
+                        value: fmt(exitWidth.noVoiceIn, 2),
+                        detail: `in (OL × 0.20) · ${fmt(exitWidth.noVoiceFt, 2)} ft`,
+                      },
+                      {
+                        label: "With sprinklers + voice evacuation",
+                        value: fmt(exitWidth.voiceIn, 2),
+                        detail: `in (OL × 0.15) · ${fmt(exitWidth.voiceFt, 2)} ft`,
+                      },
+                    ]
+                  : [
+                      {
+                        label: "Results",
+                        value: "—",
+                        detail: "Enter a non-negative occupant load.",
+                      },
+                    ]
+              }
+            />
+          </Section>
+
           <p className="text-center text-xs text-zinc-500 dark:text-zinc-500">
             Deploy on Vercel from the <code className="rounded bg-zinc-200 px-1 py-0.5 dark:bg-zinc-800">calculator-web</code>{" "}
-            folder. Sheet2–3 in the workbook are empty; Plan Type / Occupancy list validations referenced another file and
-            are not included here.
+            folder. Sheet2–3 in the workbook are empty in the source Excel file.
           </p>
         </div>
       </div>
