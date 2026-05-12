@@ -250,7 +250,7 @@ export default function Home() {
             Cheezebeard Productions Presents:
           </p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-            Firelord Josh's Fire Calculations
+            {"Firelord Josh's Fire Calculations"}
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
             Same formulas as your workbook{" "}
