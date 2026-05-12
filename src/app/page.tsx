@@ -252,7 +252,13 @@ export default function Home() {
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
             Firelord Josh's Fire Calculations
           </h1>
-
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+            Same formulas as your workbook{" "}
+            <span className="whitespace-nowrap font-mono text-xs text-zinc-500">
+              Hazen Williams Formula and K,P,Q.xlsx
+            </span>{" "}
+            (Sheet1). Enter values on the left; results update instantly.
+          </p>
         </header>
 
         <div className="flex flex-col gap-8">
