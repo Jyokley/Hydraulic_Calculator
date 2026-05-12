@@ -246,19 +246,9 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-b from-zinc-100 to-zinc-200 pb-16 pt-10 dark:from-zinc-950 dark:to-zinc-900">
       <div className="mx-auto max-w-3xl px-4">
         <header className="mb-10 text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
-            Cheezebeard Productions Presents:
-          </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-            {"Firelord Josh's Fire Calculations"}
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            {"Josh's Fire Calculations"}
           </h1>
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-            Same formulas as your workbook{" "}
-            <span className="whitespace-nowrap font-mono text-xs text-zinc-500">
-              Hazen Williams Formula and K,P,Q.xlsx
-            </span>{" "}
-            (Sheet1). Enter values on the left; results update instantly.
-          </p>
         </header>
 
         <div className="flex flex-col gap-8">
@@ -569,11 +559,6 @@ export default function Home() {
               }
             />
           </Section>
-
-          <p className="text-center text-xs text-zinc-500 dark:text-zinc-500">
-            Deploy on Vercel from the <code className="rounded bg-zinc-200 px-1 py-0.5 dark:bg-zinc-800">calculator-web</code>{" "}
-            folder. Sheet2–3 in the workbook are empty in the source Excel file.
-          </p>
         </div>
       </div>
     </div>
