@@ -247,18 +247,12 @@ export default function Home() {
       <div className="mx-auto max-w-3xl px-4">
         <header className="mb-10 text-center">
           <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
-            Hazen–Williams · K, P, Q
+            Cheezebeard Productions Presents:
           </p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-            Hydraulic calculator
+            Firelord Josh's Fire Calculations
           </h1>
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-            Same formulas as your workbook{" "}
-            <span className="whitespace-nowrap font-mono text-xs text-zinc-500">
-              Hazen Williams Formula and K,P,Q.xlsx
-            </span>{" "}
-            (Sheet1). Enter values on the left; results update instantly.
-          </p>
+
         </header>
 
         <div className="flex flex-col gap-8">
